@@ -1,0 +1,60 @@
+## ide
+**/.idea
+*.iml
+rebel.xml
+.vscode/
+.settings/
+.project
+.classpath
+.factorypath
+
+## backend
+**/target
+**/logs
+*.log
+hs_err_pid*
+replay_pid*
+dump.hprof
+heapdump.hprof
+
+## maven
+dependency-reduced-pom.xml
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+release.properties
+
+## front
+**/*.lock
+**/bower_components
+**/node_modules
+os_del.cmd
+os_del_doc.cmd
+
+## version control
+.svn
+.git
+
+## OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+## temp files
+*.tmp
+*.bak
+*.swp
+*~
+*.orig
+
+## docker
+docker-compose.override.yml
+
+## misc
+derby.log
+nb-configuration.xml
+HELP.md
+.mvn/
+mvnw
+mvnw.cmd
+
