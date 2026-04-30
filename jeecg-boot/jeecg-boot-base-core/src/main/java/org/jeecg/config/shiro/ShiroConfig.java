@@ -101,6 +101,11 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/sys/user/phoneVerification", "anon");//用户忘记密码验证手机号
         filterChainDefinitionMap.put("/sys/user/passwordChange", "anon");//用户更改密码
         filterChainDefinitionMap.put("/auth/2step-code", "anon");//登录验证码
+        
+        // WebGame 模块认证接口免登录
+        filterChainDefinitionMap.put("/webgame/auth/login", "anon");  // WebGame 登录
+        filterChainDefinitionMap.put("/webgame/auth/register", "anon");  // WebGame 注册
+        filterChainDefinitionMap.put("/webgame/auth/logout", "anon");  // WebGame 登出
         filterChainDefinitionMap.put("/sys/common/static/**", "anon");//图片预览 &下载文件不限制token
         filterChainDefinitionMap.put("/sys/common/pdf/**", "anon");//pdf预览
 
