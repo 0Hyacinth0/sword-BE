@@ -107,6 +107,11 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/webgame/auth/register", "anon");  // WebGame 注册
         filterChainDefinitionMap.put("/webgame/auth/logout", "anon");  // WebGame 登出
         filterChainDefinitionMap.put("/webgame/auth/check-username", "anon");  // WebGame 检测用户名
+        
+        // WebGame 模块业务接口（暂时免 Shiro 认证，使用自己的 Token 验证）
+        filterChainDefinitionMap.put("/webgame/character/**", "anon");  // WebGame 角色模块
+        filterChainDefinitionMap.put("/webgame/item/**", "anon");  // WebGame 物品模块
+        filterChainDefinitionMap.put("/webgame/battle/**", "anon");  // WebGame 战斗模块
         filterChainDefinitionMap.put("/sys/common/static/**", "anon");//图片预览 &下载文件不限制token
         filterChainDefinitionMap.put("/sys/common/pdf/**", "anon");//pdf预览
 
