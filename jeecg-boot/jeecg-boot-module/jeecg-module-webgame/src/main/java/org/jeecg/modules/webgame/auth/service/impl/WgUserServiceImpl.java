@@ -14,6 +14,7 @@ import org.jeecg.modules.webgame.auth.entity.WgUser;
 import org.jeecg.modules.webgame.auth.mapper.WgUserMapper;
 import org.jeecg.modules.webgame.auth.service.IWgUserService;
 import org.jeecg.modules.webgame.auth.vo.LoginVO;
+import org.jeecg.modules.webgame.auth.vo.UsernameCheckVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -121,5 +122,25 @@ public class WgUserServiceImpl extends ServiceImpl<WgUserMapper, WgUser> impleme
         queryWrapper.eq(WgUser::getUsername, username);
         queryWrapper.eq(WgUser::getDelFlag, 0);
         return this.getOne(queryWrapper);
+    }
+
+    @Override
+    public UsernameCheckVO checkUsername(String username) {
+        UsernameCheckVO result = new UsernameCheckVO();
+        
+        // 查询用户名是否已存在
+        WgUser existUser = this.getUserByUsername(username);
+        
+        if (existUser != null) {
+            // 用户名已存在
+            result.setAvailable(false);
+            log.info("用户名已存在: {}", username);
+        } else {
+            // 用户名可用
+            result.setAvailable(true);
+            log.info("用户名可用: {}", username);
+        }
+        
+        return result;
     }
 }

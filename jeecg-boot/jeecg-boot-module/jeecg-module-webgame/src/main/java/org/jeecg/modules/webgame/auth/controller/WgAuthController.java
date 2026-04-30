@@ -9,6 +9,7 @@ import org.jeecg.modules.webgame.auth.dto.LoginDTO;
 import org.jeecg.modules.webgame.auth.dto.RegisterDTO;
 import org.jeecg.modules.webgame.auth.service.IWgUserService;
 import org.jeecg.modules.webgame.auth.vo.LoginVO;
+import org.jeecg.modules.webgame.auth.vo.UsernameCheckVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -78,6 +79,36 @@ public class WgAuthController {
             return Result.OK("已退出登录");
         } catch (Exception e) {
             log.error("登出失败", e);
+            return Result.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 检测用户名是否可用
+     * @param username 用户名
+     * @return 检测结果
+     */
+    @Operation(summary = "检测用户名是否可用")
+    @GetMapping("/check-username")
+    public Result<UsernameCheckVO> checkUsername(@RequestParam("username") String username) {
+        try {
+            // 参数校验
+            if (username == null || username.trim().isEmpty()) {
+                return Result.error("用户名不能为空");
+            }
+            if (username.length() < 3 || username.length() > 20) {
+                return Result.error("用户名需要3-20个字符");
+            }
+            
+            UsernameCheckVO result = wgUserService.checkUsername(username.trim());
+            
+            if (result.getAvailable()) {
+                return Result.OK("用户名可用", result);
+            } else {
+                return Result.OK("该用户名已被注册", result);
+            }
+        } catch (Exception e) {
+            log.error("检测用户名失败", e);
             return Result.error(e.getMessage());
         }
     }

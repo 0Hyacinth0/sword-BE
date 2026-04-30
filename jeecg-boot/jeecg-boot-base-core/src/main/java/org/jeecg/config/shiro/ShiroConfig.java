@@ -106,6 +106,7 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/webgame/auth/login", "anon");  // WebGame 登录
         filterChainDefinitionMap.put("/webgame/auth/register", "anon");  // WebGame 注册
         filterChainDefinitionMap.put("/webgame/auth/logout", "anon");  // WebGame 登出
+        filterChainDefinitionMap.put("/webgame/auth/check-username", "anon");  // WebGame 检测用户名
         filterChainDefinitionMap.put("/sys/common/static/**", "anon");//图片预览 &下载文件不限制token
         filterChainDefinitionMap.put("/sys/common/pdf/**", "anon");//pdf预览
 

@@ -5,6 +5,7 @@ import org.jeecg.modules.webgame.auth.dto.LoginDTO;
 import org.jeecg.modules.webgame.auth.dto.RegisterDTO;
 import org.jeecg.modules.webgame.auth.entity.WgUser;
 import org.jeecg.modules.webgame.auth.vo.LoginVO;
+import org.jeecg.modules.webgame.auth.vo.UsernameCheckVO;
 
 /**
  * @Description: 游戏用户Service
@@ -38,4 +39,11 @@ public interface IWgUserService extends IService<WgUser> {
      * @return 用户信息
      */
     WgUser getUserByUsername(String username);
+
+    /**
+     * 检测用户名是否可用
+     * @param username 用户名
+     * @return 检测结果
+     */
+    UsernameCheckVO checkUsername(String username);
 }
