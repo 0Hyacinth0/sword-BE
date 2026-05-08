@@ -52,8 +52,14 @@ public class WgCharacter implements Serializable {
     /**生命值*/
     private Integer hp;
     
+    /**最大生命值*/
+    private Integer maxHp;
+    
     /**魔法值*/
     private Integer mp;
+    
+    /**最大魔法值*/
+    private Integer maxMp;
     
     /**物理攻击力*/
     private Integer physicalAttack;
@@ -69,6 +75,24 @@ public class WgCharacter implements Serializable {
     
     /**暴击率*/
     private Double criticalRate;
+    
+    /**战宠加成-生命值*/
+    private Integer bonusHp;
+    
+    /**战宠加成-物理攻击*/
+    private Integer bonusPhysicalAttack;
+    
+    /**战宠加成-魔法攻击*/
+    private Integer bonusMagicAttack;
+    
+    /**战宠加成-防御力*/
+    private Integer bonusDefense;
+    
+    /**角色头像URL（小图，用于角色列表卡片）*/
+    private String avatarUrl;
+    
+    /**角色立绘URL（大图，用于角色详情面板）*/
+    private String portraitUrl;
     
     /**创建时间*/
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")

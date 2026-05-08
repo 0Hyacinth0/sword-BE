@@ -1,9 +1,11 @@
 package org.jeecg.modules.webgame.character.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.jeecg.modules.webgame.character.dto.AddExperienceDTO;
 import org.jeecg.modules.webgame.character.dto.AttributePointDTO;
 import org.jeecg.modules.webgame.character.dto.CreateCharacterDTO;
 import org.jeecg.modules.webgame.character.entity.WgCharacter;
+import org.jeecg.modules.webgame.character.vo.AddExperienceResultVO;
 import org.jeecg.modules.webgame.character.vo.CharacterVO;
 
 import java.util.List;
@@ -32,11 +34,10 @@ public interface IWgCharacterService extends IService<WgCharacter> {
 
     /**
      * 属性加点
-     * @param characterId 角色ID
      * @param pointDTO 加点参数
      * @return 更新后的角色信息
      */
-    CharacterVO addAttributePoints(String characterId, AttributePointDTO pointDTO);
+    CharacterVO updateAttributes(AttributePointDTO pointDTO);
 
     /**
      * 获取用户的角色列表
@@ -51,4 +52,11 @@ public interface IWgCharacterService extends IService<WgCharacter> {
      * @param userId 用户ID（用于验证权限）
      */
     void deleteCharacter(String characterId, String userId);
+
+    /**
+     * 增加经验并处理升级
+     * @param dto 增加经验参数
+     * @return 增加经验结果（包含角色数据和升级信息）
+     */
+    AddExperienceResultVO addExperience(AddExperienceDTO dto);
 }

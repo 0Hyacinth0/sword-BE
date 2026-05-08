@@ -31,6 +31,15 @@ public class WgItemTemplate implements Serializable {
     /**物品类型(1-装备,2-消耗品,3-材料)*/
     private Integer itemType;
     
+    /**物品分类(consumable/material/equipment)*/
+    private String category;
+    
+    /**稀有度(Normal/Rare/Epic/Legendary)*/
+    private String rarity;
+    
+    /**最大堆叠数量*/
+    private Integer maxStack;
+    
     /**装备部位(1-武器,2-头部,3-胸部,4-腿部,5-饰品)*/
     private Integer equipSlot;
     
@@ -54,6 +63,22 @@ public class WgItemTemplate implements Serializable {
     
     /**出售价格*/
     private Integer sellPrice;
+    
+    // ==================== 消耗品特有字段 ====================
+    
+    /**效果类型(heal_hp/heal_mp/add_exp/revive)*/
+    private String effectType;
+    
+    /**效果数值*/
+    private Integer effectValue;
+    
+    // ==================== 材料特有字段 ====================
+    
+    /**获取途径描述*/
+    private String source;
+    
+    /**用途描述*/
+    private String usage;
     
     /**创建时间*/
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")

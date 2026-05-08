@@ -4,11 +4,15 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.exception.JeecgBootException;
+import org.jeecg.modules.webgame.character.dto.AddExperienceDTO;
 import org.jeecg.modules.webgame.character.dto.AttributePointDTO;
 import org.jeecg.modules.webgame.character.dto.CreateCharacterDTO;
 import org.jeecg.modules.webgame.character.entity.WgCharacter;
 import org.jeecg.modules.webgame.character.mapper.WgCharacterMapper;
 import org.jeecg.modules.webgame.character.service.IWgCharacterService;
+import org.jeecg.modules.webgame.character.util.CharacterStatsCalculator;
+import org.jeecg.modules.webgame.character.util.ExperienceCalculator;
+import org.jeecg.modules.webgame.character.vo.AddExperienceResultVO;
 import org.jeecg.modules.webgame.character.vo.CharacterVO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,14 +32,14 @@ import java.util.stream.Collectors;
 public class WgCharacterServiceImpl extends ServiceImpl<WgCharacterMapper, WgCharacter> implements IWgCharacterService {
 
     /**
-     * 职业基础属性配置
-     * 格式: 职业ID -> {力量, 智力, 敏捷, HP, MP, 物攻, 魔攻, 防御, 闪避, 暴击}
+     * 职业基础属性配置（1级初始值）
+     * 格式: 职业ID -> {力量, 智力, 敏捷}
      */
-    private static final double[][] PROFESSION_BASE_STATS = {
+    private static final int[][] PROFESSION_BASE_ATTRIBUTES = {
         {},  // 0 - 占位
-        {10, 2, 5, 150, 30, 15, 0, 8, 0.02, 0.05},   // 1 - 战士
-        {3, 12, 6, 80, 100, 5, 18, 4, 0.05, 0.08},    // 2 - 法师
-        {6, 5, 10, 100, 50, 12, 5, 6, 0.08, 0.10}     // 3 - 猎人
+        {10, 3, 5},   // 1 - 战士
+        {2, 12, 4},   // 2 - 法师
+        {5, 4, 11}    // 3 - 猎人
     };
 
     /**
@@ -80,8 +84,16 @@ public class WgCharacterServiceImpl extends ServiceImpl<WgCharacterMapper, WgCha
             throw new JeecgBootException("角色名称已存在，请更换名称");
         }
 
-        // 4. 根据职业初始化属性
-        double[] baseStats = PROFESSION_BASE_STATS[createDTO.getProfession()];
+        // 4. 根据职业初始化基础属性
+        int[] baseAttrs = PROFESSION_BASE_ATTRIBUTES[createDTO.getProfession()];
+        int str = baseAttrs[0];
+        int intelligence = baseAttrs[1];
+        int agi = baseAttrs[2];
+        
+        // 计算衍生属性
+        CharacterStatsCalculator.DerivedStats derived = CharacterStatsCalculator.calculateBaseStats(
+            str, intelligence, agi, createDTO.getProfession()
+        );
         
         WgCharacter character = new WgCharacter();
         character.setUserId(userId);
@@ -91,16 +103,18 @@ public class WgCharacterServiceImpl extends ServiceImpl<WgCharacterMapper, WgCha
         character.setExperience(0L);
         
         // 设置基础属性
-        character.setStrength((int)baseStats[0]);
-        character.setIntelligence((int)baseStats[1]);
-        character.setAgility((int)baseStats[2]);
-        character.setHp((int)baseStats[3]);
-        character.setMp((int)baseStats[4]);
-        character.setPhysicalAttack((int)baseStats[5]);
-        character.setMagicAttack((int)baseStats[6]);
-        character.setDefense((int)baseStats[7]);
-        character.setDodgeRate(baseStats[8]);
-        character.setCriticalRate(baseStats[9]);
+        character.setStrength(str);
+        character.setIntelligence(intelligence);
+        character.setAgility(agi);
+        
+        // 设置衍生属性
+        character.setHp(derived.getMaxHp());
+        character.setMp(derived.getMaxMp());
+        character.setPhysicalAttack(derived.getPhysicalAttack());
+        character.setMagicAttack(derived.getMagicAttack());
+        character.setDefense(derived.getDefense());
+        character.setDodgeRate(derived.getDodgeRate());
+        character.setCriticalRate(derived.getCriticalRate());
         
         character.setCreateTime(new Date());
         character.setUpdateTime(new Date());
@@ -129,17 +143,22 @@ public class WgCharacterServiceImpl extends ServiceImpl<WgCharacterMapper, WgCha
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public CharacterVO addAttributePoints(String characterId, AttributePointDTO pointDTO) {
-        // 1. 查询角色
+    public CharacterVO updateAttributes(AttributePointDTO pointDTO) {
+        // 1. 查询角色（从pointDTO中获取characterId）
+        String characterId = pointDTO.getCharacterId();
+        if (characterId == null || characterId.isEmpty()) {
+            throw new JeecgBootException("角色ID不能为空");
+        }
+        
         WgCharacter character = this.getById(characterId);
         if (character == null || character.getDelFlag() == 1) {
             throw new JeecgBootException("角色不存在");
         }
 
         // 2. 计算总加点数
-        int totalPoints = (pointDTO.getStrengthPoint() == null ? 0 : pointDTO.getStrengthPoint()) +
-                         (pointDTO.getIntelligencePoint() == null ? 0 : pointDTO.getIntelligencePoint()) +
-                         (pointDTO.getAgilityPoint() == null ? 0 : pointDTO.getAgilityPoint());
+        int totalPoints = (pointDTO.getStr() == null ? 0 : pointDTO.getStr()) +
+                         (pointDTO.getIntelligence() == null ? 0 : pointDTO.getIntelligence()) +
+                         (pointDTO.getAgi() == null ? 0 : pointDTO.getAgi());
 
         if (totalPoints <= 0) {
             throw new JeecgBootException("加点数量必须大于0");
@@ -154,14 +173,14 @@ public class WgCharacterServiceImpl extends ServiceImpl<WgCharacterMapper, WgCha
         }
 
         // 5. 更新属性
-        if (pointDTO.getStrengthPoint() != null && pointDTO.getStrengthPoint() > 0) {
-            character.setStrength(character.getStrength() + pointDTO.getStrengthPoint());
+        if (pointDTO.getStr() != null && pointDTO.getStr() > 0) {
+            character.setStrength(character.getStrength() + pointDTO.getStr());
         }
-        if (pointDTO.getIntelligencePoint() != null && pointDTO.getIntelligencePoint() > 0) {
-            character.setIntelligence(character.getIntelligence() + pointDTO.getIntelligencePoint());
+        if (pointDTO.getIntelligence() != null && pointDTO.getIntelligence() > 0) {
+            character.setIntelligence(character.getIntelligence() + pointDTO.getIntelligence());
         }
-        if (pointDTO.getAgilityPoint() != null && pointDTO.getAgilityPoint() > 0) {
-            character.setAgility(character.getAgility() + pointDTO.getAgilityPoint());
+        if (pointDTO.getAgi() != null && pointDTO.getAgi() > 0) {
+            character.setAgility(character.getAgility() + pointDTO.getAgi());
         }
 
         // 6. 重新计算衍生属性
@@ -171,11 +190,11 @@ public class WgCharacterServiceImpl extends ServiceImpl<WgCharacterMapper, WgCha
         character.setUpdateTime(new Date());
         this.updateById(character);
 
-        log.info("属性加点成功: characterId={}, strength+={}, intelligence+={}, agility+={}",
+        log.info("属性加点成功: characterId={}, str+={}, intelligence+={}, agi+={}",
                 characterId, 
-                pointDTO.getStrengthPoint(),
-                pointDTO.getIntelligencePoint(),
-                pointDTO.getAgilityPoint());
+                pointDTO.getStr(),
+                pointDTO.getIntelligence(),
+                pointDTO.getAgi());
 
         // 8. 返回更新后的角色信息
         return convertToVO(character);
@@ -228,6 +247,7 @@ public class WgCharacterServiceImpl extends ServiceImpl<WgCharacterMapper, WgCha
         
         // 基础信息
         vo.setId(character.getId());
+        vo.setUserId(character.getUserId());
         vo.setCharacterName(character.getCharacterName());
         vo.setProfession(character.getProfession());
         vo.setProfessionName(PROFESSION_NAMES[character.getProfession()]);
@@ -256,6 +276,20 @@ public class WgCharacterServiceImpl extends ServiceImpl<WgCharacterMapper, WgCha
         vo.setDodgeRate(character.getDodgeRate());
         vo.setCriticalRate(character.getCriticalRate());
         
+        // 战宠加成（后续由战宠模块更新）
+        vo.setBonusHp(character.getBonusHp() != null ? character.getBonusHp() : 0);
+        vo.setBonusPhysicalAttack(character.getBonusPhysicalAttack() != null ? character.getBonusPhysicalAttack() : 0);
+        vo.setBonusMagicAttack(character.getBonusMagicAttack() != null ? character.getBonusMagicAttack() : 0);
+        vo.setBonusDefense(character.getBonusDefense() != null ? character.getBonusDefense() : 0);
+        
+        // 时间字段
+        vo.setCreateTime(character.getCreateTime());
+        vo.setUpdateTime(character.getUpdateTime());
+        
+        // 头像字段
+        vo.setAvatarUrl(character.getAvatarUrl());
+        vo.setPortraitUrl(character.getPortraitUrl());
+        
         return vo;
     }
 
@@ -269,67 +303,122 @@ public class WgCharacterServiceImpl extends ServiceImpl<WgCharacterMapper, WgCha
 
     /**
      * 计算可用属性点
-     * 公式: 可用点 = (等级 - 1) * 每级点数 - 已分配点数
+     * 公式: 可用点 = (等级 - 1) × 每级点数 - 已分配点数
      */
     private int calculateAvailablePoints(WgCharacter character) {
-        // 总获得点数 = (等级 - 1) * 每级点数
+        // 总获得点数 = (等级 - 1) × 每级点数
         int totalPoints = (character.getLevel() - 1) * POINTS_PER_LEVEL;
         
-        // 已分配点数 = (当前力量 + 智力 + 敏捷) - 基础属性
-        double[] baseStats = PROFESSION_BASE_STATS[character.getProfession()];
-        int allocatedPoints = (character.getStrength() - (int)baseStats[0]) +
-                             (character.getIntelligence() - (int)baseStats[1]) +
-                             (character.getAgility() - (int)baseStats[2]);
+        // 已分配点数 = (当前力量 + 智力 + 敏捷) - 职业基础属性
+        int[] baseAttrs = PROFESSION_BASE_ATTRIBUTES[character.getProfession()];
+        int allocatedPoints = (character.getStrength() - baseAttrs[0]) +
+                             (character.getIntelligence() - baseAttrs[1]) +
+                             (character.getAgility() - baseAttrs[2]);
         
-        return totalPoints - allocatedPoints;
+        return Math.max(0, totalPoints - allocatedPoints);
     }
 
     /**
      * 重新计算衍生属性
-     * 根据基础属性（力量、智力、敏捷）计算 HP、MP、攻击力等
+     * 根据标准公式：基础属性 + 职业加成
      */
     private void recalculateDerivedStats(WgCharacter character) {
-        double[] baseStats = PROFESSION_BASE_STATS[character.getProfession()];
+        CharacterStatsCalculator.DerivedStats derived = CharacterStatsCalculator.calculateBaseStats(
+            character.getStrength(),
+            character.getIntelligence(),
+            character.getAgility(),
+            character.getProfession()
+        );
         
-        // 计算属性增量
-        int strengthDiff = character.getStrength() - (int)baseStats[0];
-        int intelligenceDiff = character.getIntelligence() - (int)baseStats[1];
-        int agilityDiff = character.getAgility() - (int)baseStats[2];
-        
-        // 根据职业特性计算衍生属性
-        switch (character.getProfession()) {
-            case 1: // 战士
-                // 战士: 1点力量 = 10HP + 1物攻, 1点敏捷 = 0.5防御
-                character.setHp((int)(baseStats[3] + strengthDiff * 10));
-                character.setMp((int)baseStats[4]);  // 战士 MP 不变
-                character.setPhysicalAttack((int)(baseStats[5] + strengthDiff));
-                character.setMagicAttack((int)baseStats[6]);
-                character.setDefense((int)(baseStats[7] + agilityDiff / 2));
-                character.setDodgeRate(baseStats[8] + agilityDiff * 0.001);
-                character.setCriticalRate(baseStats[9] + strengthDiff * 0.002);
-                break;
-                
-            case 2: // 法师
-                // 法师: 1点智力 = 8MP + 2魔攻, 1点敏捷 = 0.3防御 + 0.5%闪避
-                character.setHp((int)baseStats[3]);  // 法师 HP 不变
-                character.setMp((int)(baseStats[4] + intelligenceDiff * 8));
-                character.setPhysicalAttack((int)baseStats[5]);
-                character.setMagicAttack((int)(baseStats[6] + intelligenceDiff * 2));
-                character.setDefense((int)(baseStats[7] + agilityDiff / 3));
-                character.setDodgeRate(baseStats[8] + agilityDiff * 0.005);
-                character.setCriticalRate(baseStats[9] + intelligenceDiff * 0.003);
-                break;
-                
-            case 3: // 猎人
-                // 猎人: 1点敏捷 = 5HP + 1物攻 + 1%闪避, 1点力量 = 0.5物攻
-                character.setHp((int)(baseStats[3] + agilityDiff * 5));
-                character.setMp((int)baseStats[4]);  // 猎人 MP 不变
-                character.setPhysicalAttack((int)(baseStats[5] + agilityDiff + strengthDiff / 2));
-                character.setMagicAttack((int)baseStats[6]);
-                character.setDefense((int)(baseStats[7] + agilityDiff / 4));
-                character.setDodgeRate(baseStats[8] + agilityDiff * 0.01);
-                character.setCriticalRate(baseStats[9] + agilityDiff * 0.005);
-                break;
+        // 更新衍生属性
+        character.setHp(derived.getMaxHp());
+        character.setMp(derived.getMaxMp());
+        character.setPhysicalAttack(derived.getPhysicalAttack());
+        character.setMagicAttack(derived.getMagicAttack());
+        character.setDefense(derived.getDefense());
+        character.setDodgeRate(derived.getDodgeRate());
+        character.setCriticalRate(derived.getCriticalRate());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public AddExperienceResultVO addExperience(AddExperienceDTO dto) {
+        // 1. 校验参数
+        if (dto.getExpToAdd() < 0) {
+            throw new JeecgBootException("经验值不能为负数");
         }
+
+        // 2. 查询角色
+        WgCharacter character = this.getById(dto.getCharacterId());
+        if (character == null || character.getDelFlag() == 1) {
+            throw new JeecgBootException("角色不存在");
+        }
+
+        // 3. 满级处理
+        if (character.getLevel() >= ExperienceCalculator.MAX_LEVEL) {
+            log.info("角色已满级，不增加经验: characterId={}", dto.getCharacterId());
+            AddExperienceResultVO result = new AddExperienceResultVO();
+            result.setCharacter(convertToVO(character));
+            result.setLevelUp(null);
+            return result;
+        }
+
+        // 4. 计算升级结果
+        int currentLevel = character.getLevel();
+        int currentExp = character.getExperience() != null ? character.getExperience().intValue() : 0;
+        
+        org.jeecg.modules.webgame.character.vo.LevelUpResultVO levelUpResult = 
+            ExperienceCalculator.calculateLevelUp(currentLevel, currentExp, dto.getExpToAdd());
+
+        // 5. 更新角色数据
+        character.setLevel(levelUpResult.getNewLevel());
+        character.setExperience((long) levelUpResult.getOverflowExp());
+        
+        // 累加可用属性点
+        int currentAvailablePoints = calculateAvailablePoints(character);
+        // 注意：这里需要重新计算，因为等级可能变化了
+        int newAvailablePoints = calculateAvailablePointsAfterLevelUp(
+            character, 
+            levelUpResult.getLevelsGained()
+        );
+        
+        // 6. 如果有升级，重新计算衍生属性
+        if (levelUpResult.getLevelsGained() > 0) {
+            recalculateDerivedStats(character);
+        }
+
+        // 7. 保存数据库
+        character.setUpdateTime(new Date());
+        this.updateById(character);
+
+        log.info("增加经验成功: characterId={}, exp+={}, levelUp={}",
+                dto.getCharacterId(),
+                dto.getExpToAdd(),
+                levelUpResult.getLevelsGained() > 0 ? 
+                    String.format("%d->%d", levelUpResult.getOldLevel(), levelUpResult.getNewLevel()) : "无"
+        );
+
+        // 8. 返回结果
+        AddExperienceResultVO result = new AddExperienceResultVO();
+        result.setCharacter(convertToVO(character));
+        result.setLevelUp(levelUpResult.getLevelsGained() > 0 ? levelUpResult : null);
+        
+        return result;
+    }
+
+    /**
+     * 计算升级后的可用属性点
+     */
+    private int calculateAvailablePointsAfterLevelUp(WgCharacter character, int levelsGained) {
+        // 总获得点数 = (等级 - 1) × 每级点数
+        int totalPoints = (character.getLevel() - 1) * POINTS_PER_LEVEL;
+        
+        // 已分配点数 = (当前力量 + 智力 + 敏捷) - 职业基础属性
+        int[] baseAttrs = PROFESSION_BASE_ATTRIBUTES[character.getProfession()];
+        int allocatedPoints = (character.getStrength() - baseAttrs[0]) +
+                             (character.getIntelligence() - baseAttrs[1]) +
+                             (character.getAgility() - baseAttrs[2]);
+        
+        return Math.max(0, totalPoints - allocatedPoints);
     }
 }

@@ -15,6 +15,9 @@ public class CharacterVO implements Serializable {
     /**角色ID*/
     private String id;
     
+    /**用户ID*/
+    private String userId;
+    
     /**角色名称*/
     private String characterName;
     
@@ -71,4 +74,60 @@ public class CharacterVO implements Serializable {
     
     /**暴击率*/
     private Double criticalRate;
+    
+    /**战宠加成-生命值*/
+    private Integer bonusHp;
+    
+    /**战宠加成-物理攻击*/
+    private Integer bonusPhysicalAttack;
+    
+    /**战宠加成-魔法攻击*/
+    private Integer bonusMagicAttack;
+    
+    /**战宠加成-防御力*/
+    private Integer bonusDefense;
+    
+    /**装备信息（6个槽位）*/
+    private EquipmentInfo equipment;
+    
+    /**出战战宠信息*/
+    private PetInfoVO activePet;
+    
+    /**创建时间*/
+    private java.util.Date createTime;
+    
+    /**更新时间*/
+    private java.util.Date updateTime;
+    
+    /**角色头像URL（小图，用于角色列表卡片）*/
+    private String avatarUrl;
+    
+    /**角色立绘URL（大图，用于角色详情面板）*/
+    private String portraitUrl;
+    
+    /**
+     * 装备槽位信息内部类
+     */
+    @Data
+    public static class EquipmentInfo implements Serializable {
+        private static final long serialVersionUID = 1L;
+        
+        /**武器槽位*/
+        private EquipmentVO weapon;
+        
+        /**头盔槽位*/
+        private EquipmentVO helmet;
+        
+        /**胸甲槽位*/
+        private EquipmentVO chest;
+        
+        /**护腿槽位*/
+        private EquipmentVO legs;
+        
+        /**饰品槽位1*/
+        private EquipmentVO accessory1;
+        
+        /**饰品槽位2*/
+        private EquipmentVO accessory2;
+    }
 }

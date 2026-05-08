@@ -13,15 +13,18 @@ import java.io.Serializable;
 public class AttributePointDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    /**角色ID*/
+    private String characterId;
+    
     /**力量加点*/
     @Min(value = 0, message = "力量加点不能小于0")
-    private Integer strengthPoint = 0;
+    private Integer str = 0;
     
     /**智力加点*/
     @Min(value = 0, message = "智力加点不能小于0")
-    private Integer intelligencePoint = 0;
+    private Integer intelligence = 0;
     
     /**敏捷加点*/
     @Min(value = 0, message = "敏捷加点不能小于0")
-    private Integer agilityPoint = 0;
+    private Integer agi = 0;
 }
