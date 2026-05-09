@@ -2,5 +2,9 @@
 <project version="4">
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/jeecg-boot/jeecg-module-system/jeecg-system-start/src/main/resources/flyway/sql/mysql/V3.9.2_0__webgame_character.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/jeecg-boot/jeecg-module-system/jeecg-system-start/src/main/resources/flyway/sql/mysql/V3.9.2_1__webgame_character_add_avatar.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/jeecg-boot/jeecg-module-system/jeecg-system-start/src/main/resources/flyway/sql/mysql/V3.9.2_2__webgame_inventory.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/jeecg-boot/jeecg-module-system/jeecg-system-start/src/main/resources/flyway/sql/mysql/V3.9.2_3__webgame_item_data.sql" dialect="GenericSQL" />
+    <file url="PROJECT" dialect="MySQL" />
   </component>
 </project>

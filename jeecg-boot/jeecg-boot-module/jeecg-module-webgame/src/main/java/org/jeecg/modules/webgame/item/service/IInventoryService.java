@@ -17,9 +17,10 @@ public interface IInventoryService {
     /**
      * 获取角色背包列表
      * @param characterId 角色ID
+     * @param userId 用户ID（用于权限验证）
      * @return 背包物品列表
      */
-    List<InventoryItemVO> getInventoryList(String characterId);
+    List<InventoryItemVO> getInventoryList(String characterId, String userId);
 
     /**
      * 使用消耗品

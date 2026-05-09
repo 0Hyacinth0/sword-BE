@@ -1,6 +1,7 @@
 package org.jeecg.modules.webgame.item.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -13,6 +14,7 @@ import java.util.List;
  * @Author: jeecg-boot
  * @Date: 2026-05-08
  */
+@Mapper
 public interface CharacterInventoryMapper extends BaseMapper<CharacterInventory> {
 
     /**
@@ -21,9 +23,8 @@ public interface CharacterInventoryMapper extends BaseMapper<CharacterInventory>
      * @return 背包物品列表
      */
     @Select("SELECT ci.id, ci.character_id, ci.item_id, ci.quantity, ci.obtained_at, " +
-            "it.item_name as name, it.category, it.rarity, it.description, it.icon_url, " +
-            "it.max_stack, it.sell_price, it.effect_type, it.effect_value, it.source, it.usage " +
-            "FROM character_inventory ci " +
+            "it.name, it.type, it.slot_type, it.rarity, it.base_stats, it.set_id, it.set_name, it.icon, it.description " +
+            "FROM wg_character_inventory ci " +
             "LEFT JOIN wg_item_template it ON ci.item_id = it.item_id " +
             "WHERE ci.character_id = #{characterId} " +
             "ORDER BY ci.obtained_at DESC")
@@ -35,8 +36,8 @@ public interface CharacterInventoryMapper extends BaseMapper<CharacterInventory>
      * @param itemId 物品模板ID
      * @return 背包记录
      */
-    @Select("SELECT * FROM character_inventory WHERE character_id = #{characterId} AND item_id = #{itemId}")
-    CharacterInventory selectByCharacterAndItem(@Param("characterId") String characterId, @Param("itemId") Integer itemId);
+    @Select("SELECT * FROM wg_character_inventory WHERE character_id = #{characterId} AND item_id = #{itemId}")
+    CharacterInventory selectByCharacterAndItem(@Param("characterId") String characterId, @Param("itemId") String itemId);
 
     /**
      * 更新物品数量
@@ -44,7 +45,7 @@ public interface CharacterInventoryMapper extends BaseMapper<CharacterInventory>
      * @param quantity 新数量
      * @return 影响行数
      */
-    @Update("UPDATE character_inventory SET quantity = #{quantity}, update_time = NOW() WHERE id = #{id}")
+    @Update("UPDATE wg_character_inventory SET quantity = #{quantity}, update_time = NOW() WHERE id = #{id}")
     int updateQuantity(@Param("id") String id, @Param("quantity") Integer quantity);
 
     /**
@@ -52,6 +53,6 @@ public interface CharacterInventoryMapper extends BaseMapper<CharacterInventory>
      * @param characterId 角色ID
      * @return 物品种类数
      */
-    @Select("SELECT COUNT(*) FROM character_inventory WHERE character_id = #{characterId}")
+    @Select("SELECT COUNT(*) FROM wg_character_inventory WHERE character_id = #{characterId}")
     int countByCharacterId(@Param("characterId") String characterId);
 }

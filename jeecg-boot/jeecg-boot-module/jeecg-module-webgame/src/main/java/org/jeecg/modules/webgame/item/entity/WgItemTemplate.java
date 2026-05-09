@@ -21,64 +21,39 @@ import java.util.Date;
 public class WgItemTemplate implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    /**主键ID*/
-    @TableId(type = IdType.ASSIGN_ID)
-    private String id;
+    /**物品模板ID（varchar 36）*/
+    @TableId(type = IdType.INPUT)
+    private String itemId;
     
     /**物品名称*/
-    private String itemName;
+    private String name;
     
-    /**物品类型(1-装备,2-消耗品,3-材料)*/
-    private Integer itemType;
+    /**物品类型*/
+    private Integer type;
     
-    /**物品分类(consumable/material/equipment)*/
-    private String category;
+    /**装备部位类型*/
+    private String slotType;
     
-    /**稀有度(Normal/Rare/Epic/Legendary)*/
+    /**稀有度*/
     private String rarity;
     
-    /**最大堆叠数量*/
-    private Integer maxStack;
+    /**基础属性加成（JSON格式）*/
+    private String baseStats;
     
-    /**装备部位(1-武器,2-头部,3-胸部,4-腿部,5-饰品)*/
-    private Integer equipSlot;
+    /**套装ID*/
+    private String setId;
     
-    /**品质(1-普通白色,2-稀有蓝色,3-史诗紫色,4-传说橙色)*/
-    private Integer quality;
+    /**套装名称*/
+    private String setName;
     
-    /**基础属性加成百分比*/
-    private Double baseStatPercent;
-    
-    /**附加词条数*/
-    private Integer affixCount;
-    
-    /**是否特殊被动*/
-    private Integer hasSpecialPassive;
+    /**图标URL*/
+    private String icon;
     
     /**物品描述*/
     private String description;
     
-    /**图标URL*/
-    private String iconUrl;
-    
-    /**出售价格*/
-    private Integer sellPrice;
-    
-    // ==================== 消耗品特有字段 ====================
-    
-    /**效果类型(heal_hp/heal_mp/add_exp/revive)*/
-    private String effectType;
-    
-    /**效果数值*/
-    private Integer effectValue;
-    
-    // ==================== 材料特有字段 ====================
-    
-    /**获取途径描述*/
-    private String source;
-    
-    /**用途描述*/
-    private String usage;
+    /**等级需求*/
+    private Integer levelRequirement;
     
     /**创建时间*/
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")

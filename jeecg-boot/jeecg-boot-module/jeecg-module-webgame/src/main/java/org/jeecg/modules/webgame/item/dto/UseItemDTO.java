@@ -26,4 +26,7 @@ public class UseItemDTO implements Serializable {
     @Min(value = 1, message = "使用数量必须大于0")
     @NotNull(message = "使用数量不能为空")
     private Integer quantity;
+    
+    /**用户ID（从 Token 中获取，用于权限验证）*/
+    private String userId;
 }

@@ -13,7 +13,7 @@ import java.util.Map;
 public class EquipmentVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    /**装备ID*/
+    /**装备实例ID*/
     private String id;
     
     /**装备名称*/
@@ -33,4 +33,13 @@ public class EquipmentVO implements Serializable {
     
     /**套装名称（可选）*/
     private String setName;
+    
+    /**图标URL（可选）*/
+    private String iconUrl;
+    
+    /**装备描述（可选）*/
+    private String description;
+    
+    /**等级需求（可选）*/
+    private Integer levelRequirement;
 }

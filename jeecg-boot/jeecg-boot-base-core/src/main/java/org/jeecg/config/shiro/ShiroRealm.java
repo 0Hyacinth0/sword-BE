@@ -109,7 +109,7 @@ public class ShiroRealm extends AuthorizingRealm {
         try {
             loginUser = this.checkUserTokenIsEffect(token);
         } catch (AuthenticationException e) {
-            log.error("—————校验 check token 失败——————————"+ e.getMessage(), e);
+            log.warn("—————校验 check token 失败——————————"+ e.getMessage());
             // 重新抛出异常，让JwtFilter统一处理，避免返回两次错误响应
             throw e;
         }

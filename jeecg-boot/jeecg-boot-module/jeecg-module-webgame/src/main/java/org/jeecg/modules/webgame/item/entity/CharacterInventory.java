@@ -16,7 +16,7 @@ import java.util.Date;
  * @Date: 2026-05-08
  */
 @Data
-@TableName("character_inventory")
+@TableName("wg_character_inventory")
 @EqualsAndHashCode(callSuper = false)
 public class CharacterInventory implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -28,8 +28,8 @@ public class CharacterInventory implements Serializable {
     /**角色ID*/
     private String characterId;
     
-    /**物品模板ID*/
-    private Integer itemId;
+    /**物品模板ID（varchar 36）*/
+    private String itemId;
     
     /**持有数量（≥1）*/
     private Integer quantity;

@@ -19,8 +19,8 @@ public class InventoryItemVO implements Serializable {
     /**角色ID*/
     private String characterId;
     
-    /**物品模板ID*/
-    private Integer itemId;
+    /**物品模板ID（varchar 36）*/
+    private String itemId;
     
     /**持有数量*/
     private Integer quantity;
@@ -33,37 +33,27 @@ public class InventoryItemVO implements Serializable {
     /**物品名称*/
     private String name;
     
-    /**物品分类(consumable/material/equipment)*/
-    private String category;
+    /**物品类型*/
+    private Integer type;
     
-    /**稀有度(Normal/Rare/Epic/Legendary)*/
+    /**装备部位类型*/
+    private String slotType;
+    
+    /**稀有度*/
     private String rarity;
+    
+    /**基础属性加成（JSON）*/
+    private String baseStats;
+    
+    /**套装ID*/
+    private String setId;
+    
+    /**套装名称*/
+    private String setName;
+    
+    /**图标URL*/
+    private String icon;
     
     /**物品描述*/
     private String description;
-    
-    /**图标URL*/
-    private String iconUrl;
-    
-    /**最大堆叠数量*/
-    private Integer maxStack;
-    
-    /**出售价格*/
-    private Integer sellPrice;
-    
-    // ==================== 消耗品特有字段 ====================
-    
-    /**效果类型(heal_hp/heal_mp/add_exp/revive)*/
-    private String effectType;
-    
-    /**效果数值*/
-    private Integer effectValue;
-    
-    // ==================== 材料特有字段 ====================
-    
-    /**获取途径描述*/
-    private String source;
-    
-    /**用途描述*/
-    private String usage;
 }

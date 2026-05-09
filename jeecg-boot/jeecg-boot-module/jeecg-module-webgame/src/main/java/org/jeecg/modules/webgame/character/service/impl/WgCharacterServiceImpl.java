@@ -1,5 +1,6 @@
 package org.jeecg.modules.webgame.character.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -14,12 +15,20 @@ import org.jeecg.modules.webgame.character.util.CharacterStatsCalculator;
 import org.jeecg.modules.webgame.character.util.ExperienceCalculator;
 import org.jeecg.modules.webgame.character.vo.AddExperienceResultVO;
 import org.jeecg.modules.webgame.character.vo.CharacterVO;
+import org.jeecg.modules.webgame.character.vo.EquipmentVO;
+import org.jeecg.modules.webgame.equipment.entity.CharacterEquipment;
+import org.jeecg.modules.webgame.equipment.mapper.CharacterEquipmentMapper;
+import org.jeecg.modules.webgame.item.entity.WgItemTemplate;
+import org.jeecg.modules.webgame.item.mapper.WgItemTemplateMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -30,6 +39,12 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class WgCharacterServiceImpl extends ServiceImpl<WgCharacterMapper, WgCharacter> implements IWgCharacterService {
+
+    @Autowired
+    private CharacterEquipmentMapper characterEquipmentMapper;
+
+    @Autowired
+    private WgItemTemplateMapper wgItemTemplateMapper;
 
     /**
      * 职业基础属性配置（1级初始值）
@@ -290,6 +305,88 @@ public class WgCharacterServiceImpl extends ServiceImpl<WgCharacterMapper, WgCha
         vo.setAvatarUrl(character.getAvatarUrl());
         vo.setPortraitUrl(character.getPortraitUrl());
         
+        // 装备信息（查询已穿戴的装备）
+        vo.setEquipment(buildEquipmentInfo(character.getId()));
+        
+        return vo;
+    }
+
+    /**
+     * 构建装备信息
+     */
+    private CharacterVO.EquipmentInfo buildEquipmentInfo(String characterId) {
+        CharacterVO.EquipmentInfo equipmentInfo = new CharacterVO.EquipmentInfo();
+        
+        // 查询角色的所有装备
+        List<CharacterEquipment> equipments = characterEquipmentMapper.selectByCharacterId(characterId);
+        
+        // 将装备按槽位分类
+        for (CharacterEquipment equip : equipments) {
+            EquipmentVO equipVO = buildEquipmentVO(equip);
+            if (equipVO != null) {
+                switch (equip.getSlotType()) {
+                    case "weapon":
+                        equipmentInfo.setWeapon(equipVO);
+                        break;
+                    case "helmet":
+                        equipmentInfo.setHelmet(equipVO);
+                        break;
+                    case "chest":
+                        equipmentInfo.setChest(equipVO);
+                        break;
+                    case "legs":
+                        equipmentInfo.setLegs(equipVO);
+                        break;
+                    case "accessory1":
+                        equipmentInfo.setAccessory1(equipVO);
+                        break;
+                    case "accessory2":
+                        equipmentInfo.setAccessory2(equipVO);
+                        break;
+                    default:
+                        log.warn("未知的装备槽位类型: {}", equip.getSlotType());
+                        break;
+                }
+            }
+        }
+        
+        return equipmentInfo;
+    }
+
+    /**
+     * 构建单个装备VO
+     */
+    private EquipmentVO buildEquipmentVO(CharacterEquipment equipment) {
+        // 查询物品模板
+        WgItemTemplate template = wgItemTemplateMapper.selectById(equipment.getItemId());
+        if (template == null) {
+            return null;
+        }
+
+        EquipmentVO vo = new EquipmentVO();
+        vo.setId(equipment.getId());
+        vo.setName(template.getName());
+        vo.setRarity(template.getRarity());
+        vo.setSlotType(equipment.getSlotType());
+        vo.setSetId(template.getSetId());
+        vo.setSetName(template.getSetName());
+        vo.setIconUrl(template.getIcon());
+        vo.setDescription(template.getDescription());
+        vo.setLevelRequirement(template.getLevelRequirement());
+
+        // 解析基础属性JSON
+        if (template.getBaseStats() != null) {
+            try {
+                Map<String, Object> stats = JSON.parseObject(template.getBaseStats(), Map.class);
+                vo.setStats(stats);
+            } catch (Exception e) {
+                log.warn("解析装备属性JSON失败: itemId={}", template.getItemId());
+                vo.setStats(new HashMap<>());
+            }
+        } else {
+            vo.setStats(new HashMap<>());
+        }
+
         return vo;
     }
 
