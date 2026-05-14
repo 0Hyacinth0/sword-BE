@@ -37,6 +37,15 @@ public class PetSkill implements Serializable {
     /**冷却时间(回合数)*/
     private Integer cooldown;
     
+    /**MP消耗量*/
+    private Integer mpCost;
+    
+    /**目标类型(single_enemy/all_enemies/self/single_ally/all_allies)*/
+    private String targetType;
+    
+    /**元素属性(0-无,1-火,2-水,3-风,4-地,5-光,6-暗)*/
+    private Integer element;
+    
     /**学习等级(0表示进化专属技能)*/
     private Integer learnLevel;
     
