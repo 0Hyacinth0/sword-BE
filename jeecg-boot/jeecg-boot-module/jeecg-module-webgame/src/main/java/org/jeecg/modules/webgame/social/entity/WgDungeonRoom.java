@@ -9,42 +9,47 @@ import lombok.EqualsAndHashCode;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * @Description: 好友关系表
+ * @Description: 副本房间表
  * @Author: jeecg-boot
- * @Date: 2026-04-30
+ * @Date: 2026-05-15
  */
 @Data
-@TableName("wg_friend")
+@TableName("wg_dungeon_rooms")
 @EqualsAndHashCode(callSuper = false)
-public class WgFriend implements Serializable {
+public class WgDungeonRoom implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    /**主键ID*/
-    @TableId(type = IdType.ASSIGN_ID)
+    /**主键ID(UUID)*/
+    @TableId(type = IdType.ASSIGN_UUID)
     private String id;
     
-    /**用户ID*/
-    @TableField("user_id")
-    private String userId;
+    /**关联队伍ID*/
+    @TableField("team_id")
+    private String teamId;
     
-    /**好友用户ID*/
-    @TableField("friend_user_id")
-    private String friendUserId;
+    /**副本配置ID*/
+    @TableField("dungeon_id")
+    private String dungeonId;
     
-    /**备注名称*/
-    private String remarkName;
+    /**队长角色ID*/
+    @TableField("leader_id")
+    private String leaderId;
     
-    /**好友状态(1-正常,2-拉黑)*/
-    private Integer status;
+    /**房间状态(waiting/ready/starting/in_progress/completed/cancelled)*/
+    private String status;
+    
+    /**怪物缩放倍率*/
+    private BigDecimal monsterScale;
     
     /**创建时间*/
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date createTime;
+    private Date createdAt;
     
     /**更新时间*/
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date updateTime;
+    private Date updatedAt;
 }

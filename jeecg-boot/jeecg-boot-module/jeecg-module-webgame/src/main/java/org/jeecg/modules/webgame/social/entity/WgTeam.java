@@ -12,39 +12,38 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @Description: 好友关系表
+ * @Description: 队伍表
  * @Author: jeecg-boot
- * @Date: 2026-04-30
+ * @Date: 2026-05-15
  */
 @Data
-@TableName("wg_friend")
+@TableName("wg_teams")
 @EqualsAndHashCode(callSuper = false)
-public class WgFriend implements Serializable {
+public class WgTeam implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    /**主键ID*/
-    @TableId(type = IdType.ASSIGN_ID)
+    /**主键ID(UUID)*/
+    @TableId(type = IdType.ASSIGN_UUID)
     private String id;
     
-    /**用户ID*/
-    @TableField("user_id")
-    private String userId;
+    /**队长角色ID*/
+    @TableField("leader_id")
+    private String leaderId;
     
-    /**好友用户ID*/
-    @TableField("friend_user_id")
-    private String friendUserId;
+    /**最大人数（默认4）*/
+    private Integer maxMembers;
     
-    /**备注名称*/
-    private String remarkName;
+    /**队伍状态(open/closed/in_dungeon)*/
+    private String status;
     
-    /**好友状态(1-正常,2-拉黑)*/
-    private Integer status;
+    /**目标副本标识*/
+    private String targetDungeon;
     
     /**创建时间*/
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date createTime;
+    private Date createdAt;
     
     /**更新时间*/
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date updateTime;
+    private Date updatedAt;
 }

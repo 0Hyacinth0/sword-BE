@@ -12,39 +12,33 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @Description: 好友关系表
+ * @Description: 复活记录表
  * @Author: jeecg-boot
- * @Date: 2026-04-30
+ * @Date: 2026-05-15
  */
 @Data
-@TableName("wg_friend")
+@TableName("wg_boss_revives")
 @EqualsAndHashCode(callSuper = false)
-public class WgFriend implements Serializable {
+public class WgBossRevive implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    /**主键ID*/
-    @TableId(type = IdType.ASSIGN_ID)
+    /**主键ID(UUID)*/
+    @TableId(type = IdType.ASSIGN_UUID)
     private String id;
     
-    /**用户ID*/
-    @TableField("user_id")
-    private String userId;
+    /**战斗实例ID*/
+    @TableField("battle_id")
+    private String battleId;
     
-    /**好友用户ID*/
-    @TableField("friend_user_id")
-    private String friendUserId;
+    /**被复活角色ID*/
+    @TableField("revived_character_id")
+    private String revivedCharacterId;
     
-    /**备注名称*/
-    private String remarkName;
+    /**复活者角色ID*/
+    @TableField("reviver_character_id")
+    private String reviverCharacterId;
     
-    /**好友状态(1-正常,2-拉黑)*/
-    private Integer status;
-    
-    /**创建时间*/
+    /**复活时间*/
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date createTime;
-    
-    /**更新时间*/
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date updateTime;
+    private Date reviveTime;
 }

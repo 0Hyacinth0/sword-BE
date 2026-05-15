@@ -12,39 +12,44 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @Description: 好友关系表
+ * @Description: Boss配置表
  * @Author: jeecg-boot
- * @Date: 2026-04-30
+ * @Date: 2026-05-15
  */
 @Data
-@TableName("wg_friend")
+@TableName("wg_boss_configs")
 @EqualsAndHashCode(callSuper = false)
-public class WgFriend implements Serializable {
+public class WgBossConfig implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    /**主键ID*/
-    @TableId(type = IdType.ASSIGN_ID)
+    /**主键ID(UUID)*/
+    @TableId(type = IdType.ASSIGN_UUID)
     private String id;
     
-    /**用户ID*/
-    @TableField("user_id")
-    private String userId;
+    /**Boss唯一标识*/
+    @TableField("boss_id")
+    private String bossId;
     
-    /**好友用户ID*/
-    @TableField("friend_user_id")
-    private String friendUserId;
+    /**Boss名称*/
+    private String bossName;
     
-    /**备注名称*/
-    private String remarkName;
+    /**阶段配置JSON数组*/
+    private String phasesJson;
     
-    /**好友状态(1-正常,2-拉黑)*/
-    private Integer status;
+    /**狂暴配置JSON*/
+    private String enrageJson;
+    
+    /**复活配置JSON*/
+    private String reviveJson;
+    
+    /**AOE技能ID列表JSON*/
+    private String aoeSkillIds;
     
     /**创建时间*/
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date createTime;
+    private Date createdAt;
     
     /**更新时间*/
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date updateTime;
+    private Date updatedAt;
 }

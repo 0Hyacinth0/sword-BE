@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.webgame.social.mapper.WgChatMessageMapper">
+
+    <!-- 查询世界频道消息 -->
+    <select id="selectWorldMessages" resultType="org.jeecg.modules.webgame.social.entity.WgChatMessage">
+        SELECT * FROM wg_chat_messages
+        WHERE channel = 'world'
+        ORDER BY created_at DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- 查询私聊消息记录 -->
+    <select id="selectPrivateMessages" resultType="org.jeecg.modules.webgame.social.entity.WgChatMessage">
+        SELECT * FROM wg_chat_messages
+        WHERE channel = 'private'
+          AND (
+            (sender_id = #{user1Id} AND target_id = #{user2Id})
+            OR
+            (sender_id = #{user2Id} AND target_id = #{user1Id})
+          )
+        ORDER BY created_at DESC
+        LIMIT #{limit}
+    </select>
+
+</mapper>

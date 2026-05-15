@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.webgame.social.mapper.WgChatConversationMapper">
+
+    <!-- 查询角色的私聊会话列表 -->
+    <select id="selectConversationsByCharacter" resultType="org.jeecg.modules.webgame.social.entity.WgChatConversation">
+        SELECT * FROM wg_chat_conversations
+        WHERE user1_id = #{characterId} OR user2_id = #{characterId}
+        ORDER BY last_time DESC
+    </select>
+
+</mapper>

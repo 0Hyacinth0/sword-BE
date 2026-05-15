@@ -12,39 +12,36 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @Description: 好友关系表
+ * @Description: 入队申请表
  * @Author: jeecg-boot
- * @Date: 2026-04-30
+ * @Date: 2026-05-15
  */
 @Data
-@TableName("wg_friend")
+@TableName("wg_team_applications")
 @EqualsAndHashCode(callSuper = false)
-public class WgFriend implements Serializable {
+public class WgTeamApplication implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    /**主键ID*/
-    @TableId(type = IdType.ASSIGN_ID)
+    /**主键ID(UUID)*/
+    @TableId(type = IdType.ASSIGN_UUID)
     private String id;
     
-    /**用户ID*/
-    @TableField("user_id")
-    private String userId;
+    /**队伍ID*/
+    @TableField("team_id")
+    private String teamId;
     
-    /**好友用户ID*/
-    @TableField("friend_user_id")
-    private String friendUserId;
+    /**申请者角色ID*/
+    @TableField("applicant_id")
+    private String applicantId;
     
-    /**备注名称*/
-    private String remarkName;
-    
-    /**好友状态(1-正常,2-拉黑)*/
-    private Integer status;
+    /**申请状态(pending/accepted/rejected)*/
+    private String status;
     
     /**创建时间*/
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date createTime;
+    private Date createdAt;
     
     /**更新时间*/
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date updateTime;
+    private Date updatedAt;
 }

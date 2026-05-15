@@ -14,37 +14,27 @@ import java.util.Date;
 /**
  * @Description: 好友关系表
  * @Author: jeecg-boot
- * @Date: 2026-04-30
+ * @Date: 2026-05-15
  */
 @Data
-@TableName("wg_friend")
+@TableName("wg_friendships")
 @EqualsAndHashCode(callSuper = false)
-public class WgFriend implements Serializable {
+public class WgFriendship implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    /**主键ID*/
-    @TableId(type = IdType.ASSIGN_ID)
+    /**主键ID(UUID)*/
+    @TableId(type = IdType.ASSIGN_UUID)
     private String id;
     
-    /**用户ID*/
-    @TableField("user_id")
-    private String userId;
+    /**角色1 ID（较小的ID）*/
+    @TableField("character_id_1")
+    private String characterId1;
     
-    /**好友用户ID*/
-    @TableField("friend_user_id")
-    private String friendUserId;
+    /**角色2 ID（较大的ID）*/
+    @TableField("character_id_2")
+    private String characterId2;
     
-    /**备注名称*/
-    private String remarkName;
-    
-    /**好友状态(1-正常,2-拉黑)*/
-    private Integer status;
-    
-    /**创建时间*/
+    /**建立好友时间*/
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date createTime;
-    
-    /**更新时间*/
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date updateTime;
+    private Date createdAt;
 }

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.webgame.social.mapper.WgFriendRequestMapper">
+
+    <!-- 查询接收者的待处理请求 -->
+    <select id="selectPendingRequestsByReceiver" resultType="org.jeecg.modules.webgame.social.entity.WgFriendRequest">
+        SELECT * FROM wg_friend_requests
+        WHERE to_character_id = #{toCharacterId} AND status = 'pending'
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 查询发送者的已发送请求 -->
+    <select id="selectSentRequestsBySender" resultType="org.jeecg.modules.webgame.social.entity.WgFriendRequest">
+        SELECT * FROM wg_friend_requests
+        WHERE from_character_id = #{fromCharacterId} AND status = 'pending'
+        ORDER BY created_at DESC
+    </select>
+
+</mapper>
