@@ -4,10 +4,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.modules.webgame.map.dto.EnterMapDTO;
 import org.jeecg.modules.webgame.map.dto.MapAreaDTO;
 import org.jeecg.modules.webgame.map.dto.WildBattleSettleDTO;
 import org.jeecg.modules.webgame.map.service.IWgMapAreaService;
 import org.jeecg.modules.webgame.map.service.IWildBattleService;
+import org.jeecg.modules.webgame.map.vo.EnterMapResultVO;
 import org.jeecg.modules.webgame.map.vo.WildBattleSettleResultVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -81,6 +83,27 @@ public class WgMapController {
             return Result.OK("结算成功", result);
         } catch (Exception e) {
             log.error("野外战斗结算失败", e);
+            return Result.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 进入地图（验证等级要求）
+     * @param enterDTO 进入地图请求
+     * @return 进入结果
+     */
+    @Operation(summary = "进入地图")
+    @PostMapping("/enter")
+    public Result<EnterMapResultVO> enterMap(@Validated @RequestBody EnterMapDTO enterDTO) {
+        try {
+            EnterMapResultVO result = mapAreaService.enterMap(enterDTO);
+            if (result.getSuccess()) {
+                return Result.OK(result.getMessage(), result);
+            } else {
+                return Result.error(result.getMessage());
+            }
+        } catch (Exception e) {
+            log.error("进入地图失败", e);
             return Result.error(e.getMessage());
         }
     }

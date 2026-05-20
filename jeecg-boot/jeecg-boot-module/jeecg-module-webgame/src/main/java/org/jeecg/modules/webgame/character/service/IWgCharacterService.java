@@ -3,10 +3,12 @@ package org.jeecg.modules.webgame.character.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.jeecg.modules.webgame.character.dto.AddExperienceDTO;
 import org.jeecg.modules.webgame.character.dto.AttributePointDTO;
+import org.jeecg.modules.webgame.character.dto.CheckCharacterNameDTO;
 import org.jeecg.modules.webgame.character.dto.CreateCharacterDTO;
 import org.jeecg.modules.webgame.character.entity.WgCharacter;
 import org.jeecg.modules.webgame.character.vo.AddExperienceResultVO;
 import org.jeecg.modules.webgame.character.vo.CharacterVO;
+import org.jeecg.modules.webgame.character.vo.CheckCharacterNameResultVO;
 
 import java.util.List;
 
@@ -59,4 +61,11 @@ public interface IWgCharacterService extends IService<WgCharacter> {
      * @return 增加经验结果（包含角色数据和升级信息）
      */
     AddExperienceResultVO addExperience(AddExperienceDTO dto);
+
+    /**
+     * 检查角色名称是否可用
+     * @param dto 检查参数
+     * @return 检查结果
+     */
+    CheckCharacterNameResultVO checkCharacterName(CheckCharacterNameDTO dto);
 }

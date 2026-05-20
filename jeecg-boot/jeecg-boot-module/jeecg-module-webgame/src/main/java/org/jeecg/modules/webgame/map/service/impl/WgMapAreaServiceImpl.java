@@ -3,10 +3,13 @@ package org.jeecg.modules.webgame.map.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.jeecg.modules.webgame.character.entity.WgCharacter;
+import org.jeecg.modules.webgame.character.mapper.WgCharacterMapper;
 import org.jeecg.modules.webgame.item.entity.WgItemTemplate;
 import org.jeecg.modules.webgame.item.mapper.WgItemTemplateMapper;
 import org.jeecg.modules.webgame.map.dto.AreaDropDTO;
 import org.jeecg.modules.webgame.map.dto.AreaMonsterDTO;
+import org.jeecg.modules.webgame.map.dto.EnterMapDTO;
 import org.jeecg.modules.webgame.map.dto.MapAreaDTO;
 import org.jeecg.modules.webgame.map.entity.WgAreaDrop;
 import org.jeecg.modules.webgame.map.entity.WgAreaMonster;
@@ -15,6 +18,7 @@ import org.jeecg.modules.webgame.map.mapper.WgAreaDropMapper;
 import org.jeecg.modules.webgame.map.mapper.WgAreaMonsterMapper;
 import org.jeecg.modules.webgame.map.mapper.WgMapAreaMapper;
 import org.jeecg.modules.webgame.map.service.IWgMapAreaService;
+import org.jeecg.modules.webgame.map.vo.EnterMapResultVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +43,9 @@ public class WgMapAreaServiceImpl extends ServiceImpl<WgMapAreaMapper, WgMapArea
 
     @Autowired
     private WgItemTemplateMapper itemTemplateMapper;
+
+    @Autowired
+    private WgCharacterMapper characterMapper;
 
     @Override
     public List<MapAreaDTO> getAllAreas() {
@@ -124,5 +131,43 @@ public class WgMapAreaServiceImpl extends ServiceImpl<WgMapAreaMapper, WgMapArea
         }
 
         return dto;
+    }
+
+    @Override
+    public EnterMapResultVO enterMap(EnterMapDTO dto) {
+        EnterMapResultVO result = new EnterMapResultVO();
+        
+        // 1. 查询角色信息
+        WgCharacter character = characterMapper.selectById(dto.getCharacterId());
+        if (character == null) {
+            result.setSuccess(false);
+            result.setMessage("角色不存在");
+            return result;
+        }
+        
+        // 2. 查询区域信息
+        WgMapArea area = this.getById(dto.getAreaId());
+        if (area == null) {
+            result.setSuccess(false);
+            result.setMessage("地图区域不存在");
+            return result;
+        }
+        
+        // 3. 设置基本信息
+        result.setAreaName(area.getName());
+        result.setLevelRequirement(area.getUnlockLevel());
+        result.setCharacterLevel(character.getLevel());
+        
+        // 4. 验证等级要求
+        if (character.getLevel() < area.getUnlockLevel()) {
+            result.setSuccess(false);
+            result.setMessage(String.format("等级不足！当前等级 %d，需要等级 %d",
+                    character.getLevel(), area.getUnlockLevel()));
+        } else {
+            result.setSuccess(true);
+            result.setMessage(String.format("成功进入 %s", area.getName()));
+        }
+        
+        return result;
     }
 }

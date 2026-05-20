@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.exception.JeecgBootException;
 import org.jeecg.modules.webgame.character.dto.AddExperienceDTO;
 import org.jeecg.modules.webgame.character.dto.AttributePointDTO;
+import org.jeecg.modules.webgame.character.dto.CheckCharacterNameDTO;
 import org.jeecg.modules.webgame.character.dto.CreateCharacterDTO;
 import org.jeecg.modules.webgame.character.entity.WgCharacter;
 import org.jeecg.modules.webgame.character.mapper.WgCharacterMapper;
@@ -15,6 +16,7 @@ import org.jeecg.modules.webgame.character.util.CharacterStatsCalculator;
 import org.jeecg.modules.webgame.character.util.ExperienceCalculator;
 import org.jeecg.modules.webgame.character.vo.AddExperienceResultVO;
 import org.jeecg.modules.webgame.character.vo.CharacterVO;
+import org.jeecg.modules.webgame.character.vo.CheckCharacterNameResultVO;
 import org.jeecg.modules.webgame.character.vo.EquipmentVO;
 import org.jeecg.modules.webgame.equipment.entity.CharacterEquipment;
 import org.jeecg.modules.webgame.equipment.mapper.CharacterEquipmentMapper;
@@ -517,5 +519,47 @@ public class WgCharacterServiceImpl extends ServiceImpl<WgCharacterMapper, WgCha
                              (character.getAgility() - baseAttrs[2]);
         
         return Math.max(0, totalPoints - allocatedPoints);
+    }
+
+    @Override
+    public CheckCharacterNameResultVO checkCharacterName(CheckCharacterNameDTO dto) {
+        CheckCharacterNameResultVO result = new CheckCharacterNameResultVO();
+        
+        // 1. 校验名称长度（3-20字符）
+        String name = dto.getCharacterName();
+        if (name == null || name.trim().isEmpty()) {
+            result.setAvailable(false);
+            result.setMessage("角色名称不能为空");
+            return result;
+        }
+        
+        if (name.length() < 3 || name.length() > 20) {
+            result.setAvailable(false);
+            result.setMessage("角色名称长度必须在3-20个字符之间");
+            return result;
+        }
+        
+        // 2. 检查是否包含非法字符（只允许中文、英文、数字、下划线）
+        if (!name.matches("^[\\u4e00-\\u9fa5a-zA-Z0-9_]+$")) {
+            result.setAvailable(false);
+            result.setMessage("角色名称只能包含中文、英文、数字和下划线");
+            return result;
+        }
+        
+        // 3. 检查名称是否已存在
+        LambdaQueryWrapper<WgCharacter> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(WgCharacter::getCharacterName, name);
+        queryWrapper.eq(WgCharacter::getDelFlag, 0);
+        long count = this.count(queryWrapper);
+        
+        if (count > 0) {
+            result.setAvailable(false);
+            result.setMessage("该角色名称已被使用，请更换名称");
+        } else {
+            result.setAvailable(true);
+            result.setMessage("角色名称可用");
+        }
+        
+        return result;
     }
 }

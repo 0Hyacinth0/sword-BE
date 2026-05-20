@@ -461,11 +461,11 @@ public class BattleServiceImpl implements IBattleService {
      * 查找参战单位
      */
     private CombatantVO findCombatant(BattleStateVO state, String uid) {
-        if (state.getCombatants() == null) {
+        if (state.getCombatants() == null || uid == null) {
             return null;
         }
         return state.getCombatants().stream()
-                .filter(c -> c.getUid().equals(uid))
+                .filter(c -> c.getUid() != null && c.getUid().equals(uid))
                 .findFirst()
                 .orElse(null);
     }

@@ -8,10 +8,12 @@ import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.util.JwtUtil;
 import org.jeecg.modules.webgame.character.dto.AddExperienceDTO;
 import org.jeecg.modules.webgame.character.dto.AttributePointDTO;
+import org.jeecg.modules.webgame.character.dto.CheckCharacterNameDTO;
 import org.jeecg.modules.webgame.character.dto.CreateCharacterDTO;
 import org.jeecg.modules.webgame.character.service.IWgCharacterService;
 import org.jeecg.modules.webgame.character.vo.AddExperienceResultVO;
 import org.jeecg.modules.webgame.character.vo.CharacterVO;
+import org.jeecg.modules.webgame.character.vo.CheckCharacterNameResultVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -163,6 +165,23 @@ public class WgCharacterController {
             return Result.OK("角色删除成功");
         } catch (Exception e) {
             log.error("删除角色失败", e);
+            return Result.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 检查角色名称是否可用
+     * @param dto 检查参数
+     * @return 检查结果
+     */
+    @Operation(summary = "检查角色名称")
+    @PostMapping("/check-name")
+    public Result<CheckCharacterNameResultVO> checkCharacterName(@Validated @RequestBody CheckCharacterNameDTO dto) {
+        try {
+            CheckCharacterNameResultVO result = wgCharacterService.checkCharacterName(dto);
+            return Result.OK(result);
+        } catch (Exception e) {
+            log.error("检查角色名称失败", e);
             return Result.error(e.getMessage());
         }
     }

@@ -1,8 +1,10 @@
 package org.jeecg.modules.webgame.map.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.jeecg.modules.webgame.map.dto.EnterMapDTO;
 import org.jeecg.modules.webgame.map.dto.MapAreaDTO;
 import org.jeecg.modules.webgame.map.entity.WgMapArea;
+import org.jeecg.modules.webgame.map.vo.EnterMapResultVO;
 
 import java.util.List;
 
@@ -22,4 +24,11 @@ public interface IWgMapAreaService extends IService<WgMapArea> {
      * 获取单个区域详情
      */
     MapAreaDTO getAreaById(String areaId);
+
+    /**
+     * 进入地图（验证等级要求）
+     * @param dto 进入地图请求
+     * @return 进入结果
+     */
+    EnterMapResultVO enterMap(EnterMapDTO dto);
 }

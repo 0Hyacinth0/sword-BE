@@ -61,7 +61,13 @@ public class FriendController {
     public Result<String> sendFriendRequest(
             @Validated @RequestBody FriendRequestDTO dto,
             HttpServletRequest request) {
-        String fromCharacterId = (String) request.getAttribute("characterId");
+        // 从请求头获取 characterId（前端需要在 Header 中传递）
+        String fromCharacterId = request.getHeader("X-Character-Id");
+        
+        if (fromCharacterId == null || fromCharacterId.isEmpty()) {
+            return Result.error("缺少角色ID，请在请求头中添加 X-Character-Id");
+        }
+        
         log.info("发送好友请求, from: {}, to: {}", fromCharacterId, dto.getToCharacterId());
         
         String requestId = friendService.sendFriendRequest(fromCharacterId, dto);
@@ -75,7 +81,11 @@ public class FriendController {
     public Result<FriendInfoVO> acceptFriendRequest(
             @Validated @RequestBody HandleFriendRequestDTO dto,
             HttpServletRequest request) {
-        String characterId = (String) request.getAttribute("characterId");
+        String characterId = request.getHeader("X-Character-Id");
+        if (characterId == null || characterId.isEmpty()) {
+            return Result.error("缺少角色ID，请在请求头中添加 X-Character-Id");
+        }
+        
         log.info("接受好友请求, characterId: {}, requestId: {}", characterId, dto.getRequestId());
         
         FriendInfoVO friendInfo = friendService.acceptFriendRequest(characterId, dto);
@@ -89,7 +99,11 @@ public class FriendController {
     public Result<Void> rejectFriendRequest(
             @Validated @RequestBody HandleFriendRequestDTO dto,
             HttpServletRequest request) {
-        String characterId = (String) request.getAttribute("characterId");
+        String characterId = request.getHeader("X-Character-Id");
+        if (characterId == null || characterId.isEmpty()) {
+            return Result.error("缺少角色ID，请在请求头中添加 X-Character-Id");
+        }
+        
         log.info("拒绝好友请求, characterId: {}, requestId: {}", characterId, dto.getRequestId());
         
         friendService.rejectFriendRequest(characterId, dto);
@@ -103,7 +117,11 @@ public class FriendController {
     public Result<Void> removeFriend(
             @RequestParam String friendCharacterId,
             HttpServletRequest request) {
-        String characterId = (String) request.getAttribute("characterId");
+        String characterId = request.getHeader("X-Character-Id");
+        if (characterId == null || characterId.isEmpty()) {
+            return Result.error("缺少角色ID，请在请求头中添加 X-Character-Id");
+        }
+        
         log.info("删除好友, characterId: {}, friendCharacterId: {}", characterId, friendCharacterId);
         
         friendService.removeFriend(characterId, friendCharacterId);
@@ -117,7 +135,11 @@ public class FriendController {
     public Result<Void> cancelFriendRequest(
             @Validated @RequestBody HandleFriendRequestDTO dto,
             HttpServletRequest request) {
-        String characterId = (String) request.getAttribute("characterId");
+        String characterId = request.getHeader("X-Character-Id");
+        if (characterId == null || characterId.isEmpty()) {
+            return Result.error("缺少角色ID，请在请求头中添加 X-Character-Id");
+        }
+        
         log.info("取消好友请求, characterId: {}, requestId: {}", characterId, dto.getRequestId());
         
         friendService.cancelFriendRequest(characterId, dto.getRequestId());

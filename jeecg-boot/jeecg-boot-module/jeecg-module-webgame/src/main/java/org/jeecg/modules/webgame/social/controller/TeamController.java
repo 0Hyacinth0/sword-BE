@@ -32,7 +32,12 @@ public class TeamController {
      */
     @PostMapping("/create")
     public Result<TeamInfoVO> createTeam(HttpServletRequest request) {
-        String characterId = (String) request.getAttribute("characterId");
+        String characterId = request.getHeader("X-Character-Id");
+        
+        if (characterId == null || characterId.isEmpty()) {
+            return Result.error("缺少角色ID，请在请求头中添加 X-Character-Id");
+        }
+        
         log.info("创建队伍, characterId: {}", characterId);
         
         TeamInfoVO team = teamService.createTeam(characterId);
@@ -55,7 +60,12 @@ public class TeamController {
      */
     @GetMapping("/my")
     public Result<TeamInfoVO> getMyTeam(HttpServletRequest request) {
-        String characterId = (String) request.getAttribute("characterId");
+        String characterId = request.getHeader("X-Character-Id");
+        
+        if (characterId == null || characterId.isEmpty()) {
+            return Result.error("缺少角色ID，请在请求头中添加 X-Character-Id");
+        }
+        
         log.info("获取我的队伍, characterId: {}", characterId);
         
         TeamInfoVO team = teamService.getMyTeam(characterId);
@@ -69,7 +79,12 @@ public class TeamController {
     public Result<TeamMemberVO> inviteMember(
             @Validated @RequestBody InviteDTO dto,
             HttpServletRequest request) {
-        String leaderId = (String) request.getAttribute("characterId");
+        String leaderId = request.getHeader("X-Character-Id");
+        
+        if (leaderId == null || leaderId.isEmpty()) {
+            return Result.error("缺少角色ID，请在请求头中添加 X-Character-Id");
+        }
+        
         log.info("邀请好友, leaderId: {}, targetId: {}", leaderId, dto.getCharacterId());
         
         TeamMemberVO member = teamService.inviteMember(leaderId, dto);
@@ -83,7 +98,12 @@ public class TeamController {
     public Result<TeamApplicationVO> applyTeam(
             @Validated @RequestBody ApplyTeamDTO dto,
             HttpServletRequest request) {
-        String applicantId = (String) request.getAttribute("characterId");
+        String applicantId = request.getHeader("X-Character-Id");
+        
+        if (applicantId == null || applicantId.isEmpty()) {
+            return Result.error("缺少角色ID，请在请求头中添加 X-Character-Id");
+        }
+        
         log.info("申请加入队伍, applicantId: {}, teamId: {}", applicantId, dto.getTeamId());
         
         TeamApplicationVO application = teamService.applyTeam(applicantId, dto);
@@ -97,7 +117,12 @@ public class TeamController {
     public Result<List<TeamApplicationVO>> getApplications(
             @PathVariable String teamId,
             HttpServletRequest request) {
-        String leaderId = (String) request.getAttribute("characterId");
+        String leaderId = request.getHeader("X-Character-Id");
+        
+        if (leaderId == null || leaderId.isEmpty()) {
+            return Result.error("缺少角色ID，请在请求头中添加 X-Character-Id");
+        }
+        
         log.info("获取入队申请列表, teamId: {}, leaderId: {}", teamId, leaderId);
         
         List<TeamApplicationVO> applications = teamService.getApplications(teamId, leaderId);
@@ -111,7 +136,12 @@ public class TeamController {
     public Result<TeamMemberVO> acceptApplication(
             @Validated @RequestBody HandleApplicationDTO dto,
             HttpServletRequest request) {
-        String leaderId = (String) request.getAttribute("characterId");
+        String leaderId = request.getHeader("X-Character-Id");
+        
+        if (leaderId == null || leaderId.isEmpty()) {
+            return Result.error("缺少角色ID，请在请求头中添加 X-Character-Id");
+        }
+        
         log.info("接受入队申请, leaderId: {}, applicationId: {}", leaderId, dto.getId());
         
         TeamMemberVO member = teamService.acceptApplication(leaderId, dto);
@@ -125,7 +155,12 @@ public class TeamController {
     public Result<Void> rejectApplication(
             @Validated @RequestBody HandleApplicationDTO dto,
             HttpServletRequest request) {
-        String leaderId = (String) request.getAttribute("characterId");
+        String leaderId = request.getHeader("X-Character-Id");
+        
+        if (leaderId == null || leaderId.isEmpty()) {
+            return Result.error("缺少角色ID，请在请求头中添加 X-Character-Id");
+        }
+        
         log.info("拒绝入队申请, leaderId: {}, applicationId: {}", leaderId, dto.getId());
         
         teamService.rejectApplication(leaderId, dto);
@@ -139,7 +174,12 @@ public class TeamController {
     public Result<Void> kickMember(
             @PathVariable String characterId,
             HttpServletRequest request) {
-        String leaderId = (String) request.getAttribute("characterId");
+        String leaderId = request.getHeader("X-Character-Id");
+        
+        if (leaderId == null || leaderId.isEmpty()) {
+            return Result.error("缺少角色ID，请在请求头中添加 X-Character-Id");
+        }
+        
         log.info("踢出成员, leaderId: {}, targetId: {}", leaderId, characterId);
         
         teamService.kickMember(leaderId, characterId);
@@ -151,7 +191,12 @@ public class TeamController {
      */
     @PostMapping("/leave")
     public Result<Void> leaveTeam(HttpServletRequest request) {
-        String characterId = (String) request.getAttribute("characterId");
+        String characterId = request.getHeader("X-Character-Id");
+        
+        if (characterId == null || characterId.isEmpty()) {
+            return Result.error("缺少角色ID，请在请求头中添加 X-Character-Id");
+        }
+        
         log.info("离开队伍, characterId: {}", characterId);
         
         teamService.leaveTeam(characterId);
@@ -163,7 +208,12 @@ public class TeamController {
      */
     @DeleteMapping("/disband")
     public Result<Void> disbandTeam(HttpServletRequest request) {
-        String leaderId = (String) request.getAttribute("characterId");
+        String leaderId = request.getHeader("X-Character-Id");
+        
+        if (leaderId == null || leaderId.isEmpty()) {
+            return Result.error("缺少角色ID，请在请求头中添加 X-Character-Id");
+        }
+        
         log.info("解散队伍, leaderId: {}", leaderId);
         
         teamService.disbandTeam(leaderId);
@@ -177,7 +227,12 @@ public class TeamController {
     public Result<TeamInfoVO> changeLeader(
             @Validated @RequestBody ChangeLeaderDTO dto,
             HttpServletRequest request) {
-        String leaderId = (String) request.getAttribute("characterId");
+        String leaderId = request.getHeader("X-Character-Id");
+        
+        if (leaderId == null || leaderId.isEmpty()) {
+            return Result.error("缺少角色ID，请在请求头中添加 X-Character-Id");
+        }
+        
         log.info("转让队长, leaderId: {}, newLeaderId: {}", leaderId, dto.getCharacterId());
         
         TeamInfoVO team = teamService.changeLeader(leaderId, dto);
@@ -191,7 +246,12 @@ public class TeamController {
     public Result<TeamInfoVO> changeStatus(
             @Validated @RequestBody ChangeStatusDTO dto,
             HttpServletRequest request) {
-        String leaderId = (String) request.getAttribute("characterId");
+        String leaderId = request.getHeader("X-Character-Id");
+        
+        if (leaderId == null || leaderId.isEmpty()) {
+            return Result.error("缺少角色ID，请在请求头中添加 X-Character-Id");
+        }
+        
         log.info("切换队伍状态, leaderId: {}, status: {}", leaderId, dto.getStatus());
         
         TeamInfoVO team = teamService.changeStatus(leaderId, dto);

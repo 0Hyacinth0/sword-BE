@@ -58,9 +58,8 @@ public class TeamServiceImpl implements ITeamService {
             throw new JeecgBootException("已在队伍中，不能重复创建");
         }
         
-        // 2. 创建队伍
+        // 2. 创建队伍（MyBatis-Plus 会自动生成 UUID）
         WgTeam team = new WgTeam();
-        team.setId(UUID.randomUUID().toString());
         team.setLeaderId(characterId);
         team.setMaxMembers(MAX_TEAM_MEMBERS);
         team.setStatus("open");
@@ -69,9 +68,8 @@ public class TeamServiceImpl implements ITeamService {
         
         teamMapper.insert(team);
         
-        // 3. 添加队长为成员
+        // 3. 添加队长为成员（MyBatis-Plus 会自动生成 UUID）
         WgTeamMember member = new WgTeamMember();
-        member.setId(UUID.randomUUID().toString());
         member.setTeamId(team.getId());
         member.setCharacterId(characterId);
         member.setRole("leader");
@@ -173,9 +171,8 @@ public class TeamServiceImpl implements ITeamService {
             throw new JeecgBootException("已申请过该队伍");
         }
         
-        // 4. 创建申请
+        // 4. 创建申请（MyBatis-Plus 会自动生成 UUID）
         WgTeamApplication application = new WgTeamApplication();
-        application.setId(UUID.randomUUID().toString());
         application.setTeamId(dto.getTeamId());
         application.setApplicantId(applicantId);
         application.setStatus("pending");
@@ -238,9 +235,8 @@ public class TeamServiceImpl implements ITeamService {
         application.setUpdatedAt(new Date());
         applicationMapper.updateById(application);
         
-        // 5. 添加成员
+        // 5. 添加成员（MyBatis-Plus 会自动生成 UUID）
         WgTeamMember member = new WgTeamMember();
-        member.setId(UUID.randomUUID().toString());
         member.setTeamId(team.getId());
         member.setCharacterId(application.getApplicantId());
         member.setRole("member");
@@ -349,6 +345,15 @@ public class TeamServiceImpl implements ITeamService {
     @Transactional(rollbackFor = Exception.class)
     public TeamInfoVO changeLeader(String leaderId, ChangeLeaderDTO dto) {
         log.info("转让队长, leaderId: {}, newLeaderId: {}", leaderId, dto.getCharacterId());
+        
+        // 空值检查
+        if (leaderId == null || leaderId.isEmpty()) {
+            throw new JeecgBootException("队长ID不能为空");
+        }
+        
+        if (dto.getCharacterId() == null || dto.getCharacterId().isEmpty()) {
+            throw new JeecgBootException("新队长ID不能为空");
+        }
         
         if (leaderId.equals(dto.getCharacterId())) {
             throw new JeecgBootException("不能转让给自己");
